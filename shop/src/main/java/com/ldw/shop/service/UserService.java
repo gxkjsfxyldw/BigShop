@@ -8,5 +8,9 @@ public interface UserService extends IService<User> {
      * 用户登录校验
      */
     User checkUser(String username,String password);
+    /**
+     * 根据用户名查询
+     */
+    Boolean selecetUserByUsername(String username);
 
 }

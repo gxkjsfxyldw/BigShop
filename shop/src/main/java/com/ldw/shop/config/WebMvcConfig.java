@@ -32,7 +32,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         //定义 放行路径
         String[] swaggerExcludes = new String[]{
-                "/login","/swagger**/**","/webjars/**","/v3/**","/doc.html"
+                "/login","/swagger**/**","/webjars/**","/v3/**","/doc.html","/register"
         };
 
         //拦截test接口，后续遇到实际需要拦截的接口时，在进行添加拦截  未登录不给它进入首页即可

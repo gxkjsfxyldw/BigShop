@@ -21,4 +21,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .eq(User::getPassword,password)
         );
     }
+
+    @Override
+    public Boolean selecetUserByUsername(String username) {
+        User user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, username));
+        if(user==null){
+            return false;
+        }
+        return true;
+    }
 }

@@ -17,4 +17,11 @@ public interface LoginService {
      * @return
      */
     User chckenToken(String token);
+
+    /**
+     * 注册
+     * @param user
+     * @return
+     */
+    String register(User user);
 }

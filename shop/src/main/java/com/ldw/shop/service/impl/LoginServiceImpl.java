@@ -13,7 +13,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.xml.crypto.Data;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -72,6 +75,48 @@ public class LoginServiceImpl implements LoginService {
         return sysUser;
     }
 
+    @Transactional
+    @Override
+    public String register(User user) {
+        /**
+         * 1.判断参数是否合法
+         * 2.判断账户是否已存在，存在，则此账户已被注册
+         * 3.如果账户不存在，注册用户
+         * 4.注意，加上事务，一旦中间的任何过程问题，注册的用户，需要回滚
+         */
+        if(StringUtils.isAllBlank(user.getUsername())
+                ||StringUtils.isAllBlank(user.getPassword())
+                ||StringUtils.isAllBlank(user.getNickName())){
+            return "(账号，密码，昵称)不能为空";
+        }
+        Boolean result = userService.selecetUserByUsername(user.getUsername());
+
+        if(result){
+            return "该用户已被注册";
+        }
+        User newuser =  User.builder()
+                .username(user.getUsername())
+                .password(DigestUtils.md5Hex(user.getPassword()+SALT))
+                .userFace(user.getUserFace())
+                .nickName(user.getNickName())
+                .realName(user.getRealName())
+                .userMail(user.getUserMail())
+//                .userMail(user.getUserMail())
+                .sex(user.getSex())
+                .birthDate(user.getBirthDate())
+                .phone(user.getPhone())
+                .payPassword(user.getPayPassword())
+//                .userLasttime() 最后登录时间要在退出登录时操作
+                .modifyTime(new Date())
+                .userRegtime(new Date())
+                .status(1)
+                .remark(user.getRemark())
+                .build();
+        if( userService.save(newuser)){
+            return "注册成功！";
+        }
+        return "系统故障，注册失败";
+    }
 
 
 }

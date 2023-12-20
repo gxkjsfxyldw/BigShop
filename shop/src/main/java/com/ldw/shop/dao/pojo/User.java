@@ -76,7 +76,7 @@ public class User implements Serializable {
     /**
      * 用户手机号
      */
-    @TableField(value = "user_mail")
+    @TableField(value = "phone")
     private String phone;
 
     /**
