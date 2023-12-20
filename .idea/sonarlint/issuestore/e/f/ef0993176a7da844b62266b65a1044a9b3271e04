@@ -1,0 +1,5 @@
+
+h
+java:S2259	"RA "NullPointerException" could be thrown; "getRequestAttributes" is nullable here.(„‰ëÛ
+P
+java:S1118":Add a private constructor to hide the implicit public one.(Ä¡·º
