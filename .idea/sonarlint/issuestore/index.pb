@@ -11,8 +11,6 @@ n
 >shop/src/main/java/com/ldw/shop/config/AllExceptionConfig.java,f\7\f7d93bb9d93b652904ef0851f8983c514ea22068
 <
 shop/pom.xml,1\2\127ce03ec0f5429f885be0e31b01e203e95c1a03
-j
-:shop/src/main/java/com/ldw/shop/utils/UserThreadLocal.java,9\a\9a647b52bc7ad0d6d5b6d35604cb30bb43ebbfa7
 k
 ;shop/src/main/java/com/ldw/shop/utils/HttpContextUtils.java,e\f\ef0993176a7da844b62266b65a1044a9b3271e04
 i
@@ -45,5 +43,3 @@ c
 3shop/src/main/java/com/ldw/shop/utils/JWTUtils.java,5\8\58919de0ddc23bc38d89d128e580c5772fa4c9de
 r
 Bshop/src/main/java/com/ldw/shop/service/impl/LoginServiceImpl.java,3\8\384dcfe2a9bb913e925b110d09b1c873600a09a2
-o
-?shop/src/main/java/com/ldw/shop/controller/LoginController.java,0\8\08c553589f5719e329572413c501a3d6b25031ee
