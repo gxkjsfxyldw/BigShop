@@ -121,10 +121,6 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public Result exit(String token) {
 //        //校验token的合法性
-//        User user = chckenToken(token);
-//        if(user==null){
-//            Result.fail(ErrorCode.TOKEN_ERROR.getCode(),ErrorCode.TOKEN_ERROR.getMsg());
-//        }
         User user = UserThreadLocal.get();
         //删除redis中的token
         redisTemplate.delete("TOKEN_" + token);
