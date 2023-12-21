@@ -6,6 +6,7 @@ import com.ldw.shop.common.constant.Result;
 import com.ldw.shop.dao.pojo.User;
 import com.ldw.shop.service.LoginService;
 import com.ldw.shop.vo.param.LoginVo;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
@@ -14,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-
+@Api(tags = "用户登录注册")
 @ApiModel("LoginController")
 public class LoginController {
 

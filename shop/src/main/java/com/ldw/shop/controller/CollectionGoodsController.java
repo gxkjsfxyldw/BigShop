@@ -6,12 +6,15 @@ import com.ldw.shop.dao.pojo.CollectionGoods;
 import com.ldw.shop.dao.pojo.User;
 import com.ldw.shop.service.CollectionGoodsService;
 import com.ldw.shop.utils.UserThreadLocal;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
+@Api(tags = "用户收藏商品接口管理")
 @RestController
 @RequestMapping("collection")
 @ApiModel("CollectionGoodsController")
