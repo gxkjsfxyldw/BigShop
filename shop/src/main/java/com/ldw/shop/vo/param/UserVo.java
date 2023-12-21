@@ -1,36 +1,17 @@
-package com.ldw.shop.dao.pojo;
+package com.ldw.shop.vo.param;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import java.util.Date;
-import java.io.Serializable;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@TableName(value = "User")
-public class User implements Serializable {
-
-    /**
-     *
-     * 用户表主键
-     */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
-
-    /**
-     * 账号
-     */
-    @TableField(value = "username")
-    private String username;
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+@ApiModel(value = "User用户对象",description = "提供用户能修改的字段")
+public class UserVo {
 
     /**
      * 密码
@@ -85,34 +66,9 @@ public class User implements Serializable {
      */
     @TableField(value = "pay_password")
     private String payPassword;
-
-    /**
-     * 最后登录时间
-     */
-    @TableField(value = "user_lasttime")
-    private Date userLasttime;
-    /**
-     * 修改时间
-     */
-    @TableField(value = "modify_time")
-    private Date modifyTime;
-
-    /**
-     * 注册时间
-     */
-    @TableField(value = "user_regtime")
-    private Date userRegtime;
-
-    /**
-     * 状态 1 正常 0 无效
-     */
-    @TableField(value = "status")
-    private Integer status;
-
     /**
      * 备注
      */
     @TableField(value = "remark")
     private String remark;
-
 }

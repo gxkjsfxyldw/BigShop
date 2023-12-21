@@ -14,24 +14,28 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+
 @ApiModel("LoginController")
 public class LoginController {
 
     @Autowired
     private LoginService loginService;
 
-//    @LogAnnotation(module="登录模块",opertion = "用户登录")
+    @LogAnnotation(module="登录模块",opertion = "用户登录")
     @ApiOperation(value = "登录")
     @PostMapping("/login")
     public Result login(@RequestBody LoginVo loginVo){
         return loginService.login(loginVo);
     }
 
+    @LogAnnotation(module="注册模块",opertion = "新用户注册")
     @ApiOperation("注册")
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User user){
         return ResponseEntity.ok(loginService.register(user));
     }
+
+    @LogAnnotation(module="登出模块",opertion = "用户退出登录")
     @ApiOperation("退出登录")
     @GetMapping("/exit")
     public Result exit(@RequestHeader("Authorization")String token){

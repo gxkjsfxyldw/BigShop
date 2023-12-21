@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ldw.shop.common.constant.ErrorCode;
 import com.ldw.shop.common.constant.Result;
+import com.ldw.shop.common.constant.userConstant;
 import com.ldw.shop.dao.pojo.User;
 import com.ldw.shop.service.LoginService;
 import com.ldw.shop.service.UserService;
@@ -16,11 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.xml.crypto.Data;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -30,8 +30,6 @@ public class LoginServiceImpl implements LoginService {
 
     @Autowired
     private  RedisTemplate<String,String> redisTemplate;//获取redis用户信息
-    //加密盐
-    private static final String SALT ="ldw!@#";
 
     @Override
     public Result login(LoginVo loginVo) {
@@ -49,7 +47,7 @@ public class LoginServiceImpl implements LoginService {
             return Result.fail(ErrorCode.PARAMS_ERROR.getCode(), ErrorCode.PARAMS_ERROR.getMsg());
         }
         //把密码做加密之后再传入数据库中查询 要不然直接查前端传入的是无法查到的
-        password= DigestUtils.md5Hex(password+SALT);
+        password= DigestUtils.md5Hex(password+ userConstant.SALT);
         User user = userService.checkUser(username, password);
         if(user==null){
             return Result.fail(ErrorCode.ACCOUNT_PWD_NOT_EXIST.getCode(), ErrorCode.ACCOUNT_PWD_NOT_EXIST.getMsg());
@@ -98,7 +96,7 @@ public class LoginServiceImpl implements LoginService {
         }
         User newuser =  User.builder()
                 .username(user.getUsername())
-                .password(DigestUtils.md5Hex(user.getPassword()+SALT))
+                .password(DigestUtils.md5Hex(user.getPassword()+userConstant.SALT))
                 .userFace(user.getUserFace())
                 .nickName(user.getNickName())
                 .realName(user.getRealName())
@@ -127,7 +125,7 @@ public class LoginServiceImpl implements LoginService {
 //        if(user==null){
 //            Result.fail(ErrorCode.TOKEN_ERROR.getCode(),ErrorCode.TOKEN_ERROR.getMsg());
 //        }
-        UserThreadLocal.get()
+        User user = UserThreadLocal.get();
         //删除redis中的token
         redisTemplate.delete("TOKEN_" + token);
         //更新用户最后登录时间
