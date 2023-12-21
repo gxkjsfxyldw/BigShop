@@ -41,3 +41,15 @@ i
 9shop/src/main/java/com/ldw/shop/common/aop/LogAspect.java,b\c\bcdaa316b9848cba98108b6c55b14e14f07e1f2e
 e
 5shop/src/main/java/com/ldw/shop/vo/param/LoginVo.java,1\d\1d18e0549a650424e85fca638368be9a7e9cd65a
+n
+>shop/src/main/java/com/ldw/shop/common/constant/ErrorCode.java,a\f\affc62967181e5ae2c750e1418e4277c4e17bbe2
+q
+Ashop/src/main/java/com/ldw/shop/common/constant/userConstant.java,a\a\aa2215f3a986f55be8204e96bc0d4443ff962cf8
+h
+8shop/src/main/java/com/ldw/shop/service/UserService.java,e\5\e55ba38b15f6bc6cb90bad6fa4756bb1e73289e4
+b
+2shop/src/main/java/com/ldw/shop/dao/pojo/User.java,8\f\8f97540945a6589d20ba47965aaec47f134485e1
+o
+?shop/src/main/java/com/ldw/shop/controller/LoginController.java,0\8\08c553589f5719e329572413c501a3d6b25031ee
+d
+4shop/src/main/java/com/ldw/shop/vo/param/UserVo.java,3\8\386843521bce6c0d648e934e80ab89843506a369

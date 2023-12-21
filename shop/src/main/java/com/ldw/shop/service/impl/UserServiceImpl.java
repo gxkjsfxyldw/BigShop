@@ -37,6 +37,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return true;
     }
+
     @Transactional
     @Override
     public Result updateUser(UserVo userVo) {
