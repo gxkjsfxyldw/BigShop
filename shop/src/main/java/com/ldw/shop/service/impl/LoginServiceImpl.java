@@ -125,7 +125,7 @@ public class LoginServiceImpl implements LoginService {
 //        if(user==null){
 //            Result.fail(ErrorCode.TOKEN_ERROR.getCode(),ErrorCode.TOKEN_ERROR.getMsg());
 //        }
-        UserThreadLocal.get()
+        User user = UserThreadLocal.get();
         //删除redis中的token
         redisTemplate.delete("TOKEN_" + token);
         //更新用户最后登录时间
