@@ -32,5 +32,9 @@ public class LoginController {
     public ResponseEntity<String> register(@RequestBody User user){
         return ResponseEntity.ok(loginService.register(user));
     }
-
+    @ApiOperation("退出登录")
+    @GetMapping("/exit")
+    public Result exit(@RequestHeader("Authorization")String token){
+        return loginService.exit(token);
+    }
 }

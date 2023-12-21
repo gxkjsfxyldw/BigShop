@@ -1,12 +1,14 @@
 package com.ldw.shop.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ldw.shop.common.constant.ErrorCode;
 import com.ldw.shop.common.constant.Result;
 import com.ldw.shop.dao.pojo.User;
 import com.ldw.shop.service.LoginService;
 import com.ldw.shop.service.UserService;
 import com.ldw.shop.utils.JWTUtils;
+import com.ldw.shop.utils.UserThreadLocal;
 import com.ldw.shop.vo.param.LoginVo;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -116,6 +118,22 @@ public class LoginServiceImpl implements LoginService {
             return "注册成功！";
         }
         return "系统故障，注册失败";
+    }
+    @Transactional
+    @Override
+    public Result exit(String token) {
+//        //校验token的合法性
+//        User user = chckenToken(token);
+//        if(user==null){
+//            Result.fail(ErrorCode.TOKEN_ERROR.getCode(),ErrorCode.TOKEN_ERROR.getMsg());
+//        }
+        UserThreadLocal.get()
+        //删除redis中的token
+        redisTemplate.delete("TOKEN_" + token);
+        //更新用户最后登录时间
+        user.setUserLasttime(new Date());
+        userService.updateById(user);
+        return Result.success("登录已退出");
     }
 
 

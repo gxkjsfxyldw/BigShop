@@ -24,4 +24,11 @@ public interface LoginService {
      * @return
      */
     String register(User user);
+
+    /**
+     * 退出登录
+     * @param token
+     * @return
+     */
+    Result exit(String token);
 }
