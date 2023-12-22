@@ -138,6 +138,12 @@
             <artifactId>hutool-all</artifactId>
             <version>5.8.23</version>
         </dependency>
+        <!--        Quartz 定时器-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

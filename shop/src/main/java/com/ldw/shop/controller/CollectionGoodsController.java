@@ -9,6 +9,7 @@ import com.ldw.shop.utils.UserThreadLocal;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +52,7 @@ public class CollectionGoodsController {
     //    collection/addOrCancel
     @ApiOperation("用户收藏或取消收藏商品")
     @PostMapping("addOrCancel")
-    public ResponseEntity<Void> addOrCancelProd(@RequestBody Long prodId) {
+    public ResponseEntity<Void> addOrCancelProd(@RequestBody Long prodId) throws SchedulerException {
         User user = UserThreadLocal.get();
         Integer userId = user.getId();
         collectionGoodsService.addOrCancelProd(userId,prodId);

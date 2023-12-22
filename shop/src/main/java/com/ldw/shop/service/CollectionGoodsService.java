@@ -2,6 +2,7 @@ package com.ldw.shop.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ldw.shop.dao.pojo.CollectionGoods;
+import org.quartz.SchedulerException;
 
 public interface CollectionGoodsService extends IService<CollectionGoods> {
 
@@ -10,5 +11,5 @@ public interface CollectionGoodsService extends IService<CollectionGoods> {
      * @param userId
      * @param prodId
      */
-    void addOrCancelProd(Integer userId, Long prodId);
+    void addOrCancelProd(Integer userId, Long prodId) throws SchedulerException;
 }
