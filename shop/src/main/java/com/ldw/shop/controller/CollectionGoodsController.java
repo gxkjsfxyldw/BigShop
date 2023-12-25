@@ -44,7 +44,7 @@ public class CollectionGoodsController {
         Integer userId = user.getId();
         int count = collectionGoodsService.count(new LambdaQueryWrapper<CollectionGoods>()
                 .eq(CollectionGoods::getUserId, userId)
-                .eq(CollectionGoods::getProdId, goodsId)
+                .eq(CollectionGoods::getGoodsId, goodsId)
         );
         return ResponseEntity.ok(count == 1);
     }

@@ -13,7 +13,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 用户配送地址
+ * 用户配送地址表
  */
 @Data
 @Builder

@@ -11,7 +11,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.Date;
 import java.io.Serializable;
-
+/**
+ * 用户表
+ */
 @Data
 @Builder
 @AllArgsConstructor

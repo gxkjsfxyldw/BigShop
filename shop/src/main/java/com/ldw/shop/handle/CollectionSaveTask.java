@@ -1,6 +1,7 @@
 package com.ldw.shop.handle;
 
 
+import com.ldw.shop.service.CollectionGoodsService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,11 @@ import static org.quartz.DateBuilder.futureDate;
  * 收藏 定时任务
  */
 @Slf4j
-public class CollectionSaveTask extends QuartzJobBean {
-//    @Autowired
-//    private DBService dbService;
+public class CollectionSaveTask extends QuartzJobBean{
+
+    @Autowired
+    private CollectionGoodsService collectionGoodsService;
+
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /**
@@ -26,10 +29,10 @@ public class CollectionSaveTask extends QuartzJobBean {
      */
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        log.info("LikeTask-------- {}", sdf.format(new Date()));
-        System.out.println("收藏任务 数据库持久化");
+        log.info("用户商品收藏_数据库持久化-------- {}", sdf.format(new Date()));
+
 //        try {
-//            restartFlowHandler.execute();  // 具体任务
+//             collectionGoodsService.     // 具体任务
 //        } catch (Exception e) {
 //            logger.error("任务失败 error:{}", e.getMessage());
 //        }

@@ -11,7 +11,8 @@ import static org.quartz.DateBuilder.futureDate;
  */
 public class QuartzUtils {
 
-    private String identyty;//全局唯一，任务名称
+    //全局唯一，任务名称
+    private String identyty;
     //Scheduler实例的工厂类
     private static SchedulerFactory schedulerFactory = new StdSchedulerFactory();
     //创建调度器
@@ -22,6 +23,8 @@ public class QuartzUtils {
     }
     //启动任务
     public void startScheduTask() throws SchedulerException{
+
+
         /**
          * 1.先判断当前任务是否在启动
          * 否：说明是首次启动定时任务，直接调用启动任务
@@ -54,16 +57,15 @@ public class QuartzUtils {
     public JobDetail jobDetail(){
         //newJob - 组名 - 任务名称 - 是否持久化
         //withIdentity - 全局唯一的 id - 任务名称
-        return JobBuilder.newJob(CollectionSaveTask.class)
+        return JobBuilder.newJob(CollectionSaveTask.class) //这里要改
                 .withIdentity(identyty)
                 .build();
     }
     //  创建 Trigger 触发器 定时任务内容
     public Trigger trigger(){
-
         // 使用秒  SimpleScheduleBuilder
         SimpleScheduleBuilder simpleScheduleBuilder = SimpleScheduleBuilder
-                .repeatSecondlyForever(5)
+                .repeatSecondlyForever(5)//任务开始5秒后执行
                 .withRepeatCount(0);//只执行一次，不重复
         //forJob 设置触发的对象
         return TriggerBuilder.newTrigger().forJob(jobDetail())

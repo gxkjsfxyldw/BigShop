@@ -31,14 +31,14 @@ public class CollectionGoodsServiceImpl extends ServiceImpl<CollectionGoodsMappe
         //根据用户标识和商品标识查询当前状态
         CollectionGoods userCollection = collectionGoodsMapper.selectOne(new LambdaQueryWrapper<CollectionGoods>()
                 .eq(CollectionGoods::getUserId, userId)
-                .eq(CollectionGoods::getProdId, prodId)
+                .eq(CollectionGoods::getGoodsId, prodId)
         );
         //判断是否存在
         if (ObjectUtil.isNull(userCollection)) {
             //添加收藏
             userCollection = new CollectionGoods();
             userCollection.setUserId(String.valueOf(userId));
-            userCollection.setProdId(prodId);
+            userCollection.setGoodsId(prodId);
             userCollection.setCreateTime(new Date());
             collectionGoodsMapper.insert(userCollection);
         } else {
