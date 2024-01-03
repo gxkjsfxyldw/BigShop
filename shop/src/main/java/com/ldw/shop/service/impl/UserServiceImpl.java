@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService{
 
@@ -60,5 +62,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return Result.success("更新成功");
         }
         return Result.fail(409,ErrorCode.PARAMS_ERROR.getMsg());
+    }
+
+    @Override
+    public List<User> getUserListByUserIds(List<Integer> userIds) {
+        return userMapper.selectList(new LambdaQueryWrapper<User>()
+                .in(User::getId,userIds)
+        );
     }
 }

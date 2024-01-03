@@ -5,6 +5,8 @@ import com.ldw.shop.common.constant.Result;
 import com.ldw.shop.dao.pojo.User;
 import com.ldw.shop.vo.param.UserVo;
 
+import java.util.List;
+
 public interface UserService extends IService<User> {
     /**
      * 用户登录校验
@@ -21,4 +23,11 @@ public interface UserService extends IService<User> {
      * @return
      */
     Result updateUser(UserVo userVo);
+
+    /**
+     * * 根据用户id获取用户集合
+     * @param userIds
+     * @return
+     */
+    List<User> getUserListByUserIds(List<Integer> userIds);
 }

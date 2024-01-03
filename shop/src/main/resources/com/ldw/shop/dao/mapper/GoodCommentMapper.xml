@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ldw.shop.dao.mapper.GoodsCommentMapper">
+
+<!--    &lt;!&ndash;    添加部门 调用存储过程添加&ndash;&gt;-->
+    <select id="selectComm"  statementType="CALLABLE">
+        call selectComm(
+            #{goodsId,mode=IN,jdbcType=BIGINT},
+            #{number,mode=OUT,jdbcType=INTEGER},
+            #{praiseNumber,mode=OUT,jdbcType=INTEGER},
+            #{secondaryNumber,mode=OUT,jdbcType=INTEGER},
+            #{negativeNumber,mode=OUT,jdbcType=INTEGER},
+            #{picNumber,mode=OUT,jdbcType=INTEGER})
+    </select>
+
+
+</mapper>
