@@ -1,22 +1,26 @@
 package com.ldw.shop.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ldw.shop.common.constant.Result;
+import com.ldw.shop.common.constant.ScheduConstant;
 import com.ldw.shop.dao.mapper.GoodsCartMapper;
 import com.ldw.shop.dao.mapper.GoodsMapper;
 import com.ldw.shop.dao.mapper.ShopMapper;
 import com.ldw.shop.dao.mapper.SkuMapper;
-import com.ldw.shop.dao.pojo.Goods;
-import com.ldw.shop.dao.pojo.GoodsCart;
-import com.ldw.shop.dao.pojo.Shop;
-import com.ldw.shop.dao.pojo.Sku;
+import com.ldw.shop.dao.pojo.*;
+import com.ldw.shop.handle.GoodsCartUpdateTask;
 import com.ldw.shop.service.GoodsCartService;
+import com.ldw.shop.utils.QuartzUtils;
+import com.ldw.shop.utils.UserThreadLocal;
 import com.ldw.shop.vo.param.CartItem;
 import com.ldw.shop.vo.param.ShopCatVo;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -38,7 +42,6 @@ public class GoodsCartServiceIpml extends ServiceImpl<GoodsCartMapper, GoodsCart
     @Autowired
     private SkuMapper skuMapper;
 
-
     @Autowired
     private RedisTemplate<String,Object> redisTemplate;
 
@@ -46,37 +49,70 @@ public class GoodsCartServiceIpml extends ServiceImpl<GoodsCartMapper, GoodsCart
     private long expire= 1;
 
     /**
-     * 添加商品到购物车表
-     * 1.根据商品skuid和用户标识查询购物车中商品是否存在  查redis还是数据库？
-     *  查redis：存在商品id：则更新数量和skuid（有可能是换款式了）
-     *          不存在商品id：添加商品id和skuid和数量到购物车(redis)
+     * 添加商品到购物车表 或者更新购物车商品数量
+     * 1.根据商品skuid和用户标识查询购物车中商品是否存在
+     *    查redis：存在商品id：则更新
+     *            不存在商品id：则新增
      *
      * @param goodsCart
      */
     @Override
-    public void changeItem(GoodsCart goodsCart) {
-        long expire= 5 * 60 * 1000;
+    public void changeItem(GoodsCart goodsCart) throws SchedulerException {
         //先从redis里面获取key
         String redisKey = "cat" + "::" +goodsCart.getUserId();
+        Object rediscart = redisTemplate.opsForHash().get(redisKey, goodsCart.getProdId());
+        GoodsCart oldcart =JSON.parseObject(String.valueOf(rediscart), GoodsCart.class);
+        //判断是否存在  不存在：插入数据库
+        if (ObjectUtil.isNull(oldcart)) {
+            //删除缓存
+            redisTemplate.delete(redisKey);
+            //将商品添加到购物车中
+            goodsCart.setCartDate(new Date());
+            goodsCartMapper.insert(goodsCart);
+            //再次删除缓存
+            redisTemplate.delete(redisKey);
+            return;
+        }
+        //存在：更新商品中购物车中的数量即可   更新缓存
+        oldcart.setCartCount(goodsCart.getCartCount());
+        oldcart.setSkuId(goodsCart.getSkuId());
+        oldcart.setCartDate(new Date());
 
-        //然后将方法返回的结果转换为json然后存入redis
-//        redisTemplate.opsForValue().set(redisKey, JSON.toJSONString("内容"), Duration.ofMillis(expire));
-//        redisTemplate.opsForHash().put(redisKey, ShopCatVo::getShopId,CartItem);
+        Map newMap = new HashMap();
+        newMap.put(oldcart.getProdId(),JSON.toJSONString(oldcart));
+        redisTemplate.opsForHash().putAll(redisKey,newMap);
 
+        // 定时更新到数据库
+        GoodsCartUpdateTask goodsCartUpdateTask = new GoodsCartUpdateTask();
+        QuartzUtils quartzUtils = new QuartzUtils(ScheduConstant.GoodsCart_TASK_IDENTITY);
+        try {
+            quartzUtils.jobDetail(goodsCartUpdateTask);
+        }finally {
+            quartzUtils.startScheduTask(goodsCartUpdateTask,oldcart.getProdId(),goodsCart.getUserId());
+        }
+    }
+    public Boolean updateGoodsCart(Long prodId,Integer userid){
+        //先从redis里面获取key
+        String redisKey = "cat" + "::" + userid;
+        Object rediscart = redisTemplate.opsForHash().get(redisKey,prodId);
+        GoodsCart updategoods =JSON.parseObject(String.valueOf(rediscart), GoodsCart.class);
+        if(updategoods!=null){
+            goodsCartMapper.updateById(updategoods);
+            return true;
+        }
+        return false;
     }
 
     /**
      * * 查看用户购物车列表
-     *
-     *
      * @param userid
      */
     @Override
     public List<ShopCatVo> selectUserBasketInfo(Integer userid) {
-
         String redisKey = "cat" + "::" +userid;
         List<GoodsCart> goodsCartlist = new ArrayList<>();
         Map<Object, Object> usercart = redisTemplate.opsForHash().entries(redisKey);
+        System.out.println(usercart);
         //遍历这个map
         if(usercart.isEmpty()){
             //先判断缓存有没有 就判断有没有 userid这个键就行了
@@ -86,7 +122,8 @@ public class GoodsCartServiceIpml extends ServiceImpl<GoodsCartMapper, GoodsCart
         }else{
             System.out.println("缓存");
             for (Object shopid:usercart.keySet()) {
-                goodsCartlist.add((GoodsCart) usercart.get(shopid));
+//                goodsCartlist.add((GoodsCart) usercart.get(shopid));
+                goodsCartlist.add(JSON.parseObject(String.valueOf(usercart.get(shopid)), GoodsCart.class));
             }
         }
         Map<Long, String> shopmap = new HashMap<>();
@@ -126,7 +163,7 @@ public class GoodsCartServiceIpml extends ServiceImpl<GoodsCartMapper, GoodsCart
             newgoods.add(cartItem);
 
             //存储到redis 以用户id为键，每个商品id为hash键，购物车记录为hash值，到时候删改时就直接操作该数据即可
-            redisTemplate.opsForHash().put(redisKey,goodscat.getProdId(),goodscat);
+            redisTemplate.opsForHash().put(redisKey,goodscat.getProdId(),JSON.toJSONString(goodscat));
             redisTemplate.opsForHash().getOperations().expire(redisKey,expire, TimeUnit.DAYS);//过期时间1天
         });
 

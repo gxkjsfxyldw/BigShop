@@ -9,6 +9,7 @@ import com.ldw.shop.vo.param.ShopCatVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +28,7 @@ public class GoodsCatController {
 
     @ApiOperation("添加商品到购物车或修改购物车中商品数量")
     @PostMapping("changeItem")
-    public ResponseEntity<Void> changeItem(@RequestBody GoodsCart goodsCart) {
-
+    public ResponseEntity<Void> changeItem(@RequestBody GoodsCart goodsCart) throws SchedulerException {
         User user = UserThreadLocal.get();
         goodsCart.setUserId(user.getId());
         goodsCartService.changeItem(goodsCart);
@@ -39,7 +39,6 @@ public class GoodsCatController {
     @ApiOperation("查询用户购物车列表")
     @GetMapping("info")
     public ResponseEntity<List<ShopCatVo>> loadUserCartVoInfo() {
-
         User user = UserThreadLocal.get();
         List<ShopCatVo> shopCatVos = goodsCartService.selectUserBasketInfo(user.getId());
         return ResponseEntity.ok(shopCatVos);
@@ -53,7 +52,6 @@ public class GoodsCatController {
 //        Integer basketCount = basketService.selectUserBasketCount(userId);
 //        return ResponseEntity.ok(basketCount);
 //    }
-//
 
 //
 //    //    p/shopCart/totalPay
@@ -63,17 +61,6 @@ public class GoodsCatController {
 //        CartTotalAmount cartTotalAmount = basketService.calculateUserCartTotalAmount(basketIdList);
 //        return ResponseEntity.ok(cartTotalAmount);
 //    }
-
-
-//
-//    //    p/shopCart/deleteItem
-//    @ApiOperation("删除购物车中商品")
-//    @DeleteMapping("deleteItem")
-//    public ResponseEntity<Void> deleteItem(@RequestBody List<Long> basketIds) {
-//        basketService.removeByIds(basketIds);
-//        return ResponseEntity.ok().build();
-//    }
-
 
 
 }
