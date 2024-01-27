@@ -1,22 +1,24 @@
 package com.ldw.shop.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ldw.shop.common.constant.Result;
 import com.ldw.shop.common.constant.ScheduConstant;
-import com.ldw.shop.dao.mapper.GoodsCartMapper;
-import com.ldw.shop.dao.mapper.GoodsMapper;
-import com.ldw.shop.dao.mapper.ShopMapper;
-import com.ldw.shop.dao.mapper.SkuMapper;
+import com.ldw.shop.dao.mapper.*;
 import com.ldw.shop.dao.pojo.*;
 import com.ldw.shop.handle.GoodsCartUpdateTask;
 import com.ldw.shop.service.GoodsCartService;
+import com.ldw.shop.service.SkuService;
 import com.ldw.shop.utils.QuartzUtils;
 import com.ldw.shop.utils.UserThreadLocal;
 import com.ldw.shop.vo.param.CartItem;
+import com.ldw.shop.vo.param.CartTotalAmount;
 import com.ldw.shop.vo.param.ShopCatVo;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -41,11 +44,15 @@ public class GoodsCartServiceIpml extends ServiceImpl<GoodsCartMapper, GoodsCart
     private GoodsMapper goodsMapper;
     @Autowired
     private SkuMapper skuMapper;
-
     @Autowired
     private RedisTemplate<String,Object> redisTemplate;
+    @Autowired
+    private SkuService skuService;
+    @Autowired
+    private DiscountMapper discountMapper;
 
-    //过期时间
+
+    //redis过期时间
     private long expire= 1;
 
     /**
@@ -102,7 +109,6 @@ public class GoodsCartServiceIpml extends ServiceImpl<GoodsCartMapper, GoodsCart
         }
         return false;
     }
-
     /**
      * * 查看用户购物车列表
      * @param userid
@@ -112,7 +118,6 @@ public class GoodsCartServiceIpml extends ServiceImpl<GoodsCartMapper, GoodsCart
         String redisKey = "cat" + "::" +userid;
         List<GoodsCart> goodsCartlist = new ArrayList<>();
         Map<Object, Object> usercart = redisTemplate.opsForHash().entries(redisKey);
-        System.out.println(usercart);
         //遍历这个map
         if(usercart.isEmpty()){
             //先判断缓存有没有 就判断有没有 userid这个键就行了
@@ -179,5 +184,79 @@ public class GoodsCartServiceIpml extends ServiceImpl<GoodsCartMapper, GoodsCart
             newcat.add(shopCatVo);
         }
         return newcat;
+    }
+
+    /**
+     * * 计算购物车商品总金额
+     * @param goodsCartList
+     * @return
+     */
+    @Override
+    public CartTotalAmount calculateUserCartTotalAmount(List<Long> goodsCartList) {
+
+        User user = UserThreadLocal.get();
+        String redisKey = "cat" + "::" +user.getId();
+        CartTotalAmount cartTotalAmount = new CartTotalAmount();
+
+        if (CollectionUtil.isEmpty(goodsCartList) || goodsCartList.size() == 0) {
+            return cartTotalAmount;
+        }
+
+        Map<Object, Object> usercart = redisTemplate.opsForHash().entries(redisKey);
+        List<GoodsCart> goodsCartlist = new ArrayList<>();
+
+        for (Object shopid:usercart.keySet()) {
+            goodsCartlist.add(JSON.parseObject(String.valueOf(usercart.get(shopid)), GoodsCart.class));
+        }
+        //从购物车对象集合中获取商品skuId集合
+        List<Long> skuIdList = goodsCartlist.stream().map(GoodsCart::getSkuId).collect(Collectors.toList());
+        //根据商品skuId集合查询商品sku对象集合
+        List<Sku> skuList = skuService.listByIds(skuIdList);
+        if (CollectionUtil.isEmpty(skuList) || skuList.size() == 0) {
+            throw new RuntimeException("服务器开小差了");
+        }
+
+        List<BigDecimal> allOneSkuTotalAmount = new ArrayList<>();//总价
+        List<BigDecimal> allOneSkuTotalAmountDiscount = new ArrayList<>();//优惠价
+        //循环购物车对象集合
+        goodsCartlist.forEach(basket -> {
+            //从商品sku对象集合中过滤出与当前购物车中商品sku对象一致的商品sku
+            Sku sku1 = skuList.stream()
+                    .filter(sku -> sku.getSkuId().equals(basket.getSkuId()))
+                    .collect(Collectors.toList()).get(0);
+//            //计算单个商品总金额（有些商品有多个数量）
+            Integer basketCount = basket.getCartCount();
+            BigDecimal price = sku1.getPrice();
+            //将sku价格乘商品数量，得到某个商品的总金额
+            BigDecimal oneSkuTotalAmount = price.multiply(new BigDecimal(basketCount));
+
+            if(basket.getDiscountId()!=null){
+                Discount discount = discountMapper.selectOne(new QueryWrapper<Discount>().eq("id", basket.getDiscountId()));
+                System.out.println("aa"+discount);
+                //查看单品是否符合打折要求
+                if(price.compareTo(BigDecimal.valueOf(discount.getFull_money())) == 1){
+                    BigDecimal prices = sku1.getPrice().multiply(discount.getDiscountAmount().multiply(BigDecimal.valueOf(0.1)));
+                    BigDecimal oneSkuTotalAmounts = prices.multiply(new BigDecimal(basketCount));
+                    allOneSkuTotalAmountDiscount.add(oneSkuTotalAmounts);
+                }
+            }else{
+                allOneSkuTotalAmountDiscount.add(oneSkuTotalAmount);
+            }
+            allOneSkuTotalAmount.add(oneSkuTotalAmount);
+        });
+
+        //计算所有商品总金额
+        BigDecimal allSkuTotalAmount = allOneSkuTotalAmount.stream().reduce(BigDecimal::add).get();
+        //计算优惠后商品总金额
+        BigDecimal allSkuTotalAmounts = allOneSkuTotalAmountDiscount.stream().reduce(BigDecimal::add).get();
+        BigDecimal allSubtractMoney = allSkuTotalAmount.subtract(allSkuTotalAmounts);
+        //原价
+        cartTotalAmount.setTotalMoney(allSkuTotalAmount);
+        //优惠金额
+        cartTotalAmount.setSubtractMoney(allSubtractMoney);
+        //优惠价
+        cartTotalAmount.setFinalMoney(allSkuTotalAmounts);
+
+        return cartTotalAmount;
     }
 }

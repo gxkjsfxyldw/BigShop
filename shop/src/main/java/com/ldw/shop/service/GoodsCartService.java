@@ -3,6 +3,7 @@ package com.ldw.shop.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ldw.shop.common.constant.Result;
 import com.ldw.shop.dao.pojo.GoodsCart;
+import com.ldw.shop.vo.param.CartTotalAmount;
 import com.ldw.shop.vo.param.ShopCatVo;
 import org.quartz.SchedulerException;
 
@@ -22,6 +23,10 @@ public interface GoodsCartService extends IService<GoodsCart> {
      */
     List<ShopCatVo> selectUserBasketInfo(Integer id);
 
-
-
+    /**
+     * 计算购物车中的金额
+     * @param goodsCartList
+     * @return
+     */
+    CartTotalAmount calculateUserCartTotalAmount(List<Long> goodsCartList);
 }
