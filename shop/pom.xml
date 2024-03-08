@@ -147,11 +147,17 @@
             <artifactId>easypoi-spring-boot-starter</artifactId>
             <version>4.1.3</version>
         </dependency>
-<!--        &lt;!&ndash;rabbitmq 依赖&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-amqp</artifactId>-->
-<!--        </dependency>-->
+        <!--rabbitmq 依赖-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.redisson/redisson -->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.27.0</version>
+        </dependency>
 
         <!--fastdfs     自己下载手动引入的依赖-->
         <dependency>

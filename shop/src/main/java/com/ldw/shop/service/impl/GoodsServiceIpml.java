@@ -14,6 +14,9 @@ import com.ldw.shop.dao.pojo.Goods;
 import com.ldw.shop.dao.pojo.Sku;
 import com.ldw.shop.service.CollectionGoodsService;
 import com.ldw.shop.service.GoodsService;
+import com.ldw.shop.vo.param.ChangeStock;
+import com.ldw.shop.vo.param.GoodsChange;
+import com.ldw.shop.vo.param.SkuChange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -59,5 +62,31 @@ public class GoodsServiceIpml extends ServiceImpl<GoodsMapper, Goods> implements
         );
         goods.setSkuList(skuList);
         return goods;
+    }
+
+    @Override
+    public void changeStock(ChangeStock changeStock) {
+        //获取商品sku库存数量对象
+        List<SkuChange> skuChangeList = changeStock.getSkuChangeList();
+        for (SkuChange skuChange:skuChangeList){
+            Long skuId = skuChange.getSkuId();
+            Sku sku = skuMapper.selectById(skuId);
+
+            int i = skuMapper.changeSkuStock(skuId,skuChange.getCount(),sku.getVersion());
+            if (i <= 0) {
+                throw new RuntimeException("库存数量不足");
+            }
+        }
+        //获取商品prod库存数量对象
+        List<GoodsChange> prodChangeList = changeStock.getProdChangeList();
+        for (GoodsChange prodChange:prodChangeList){
+            Long prodId = prodChange.getProdId();
+            Goods prod = goodsMapper.selectById(prodId);
+
+            int i = goodsMapper.changeProdStock(prodId,prodChange.getCount(),prod.getVersion());
+            if (i <= 0) {
+                throw new RuntimeException("库存数量不足");
+            }
+        }
     }
 }

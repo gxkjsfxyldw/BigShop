@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ldw.shop.common.constant.Result;
 import com.ldw.shop.dao.pojo.Goods;
+import com.ldw.shop.vo.param.ChangeStock;
 
 import java.util.List;
 
@@ -30,4 +31,11 @@ public interface GoodsService extends IService<Goods> {
      * @return
      */
     Goods selectProdAndSkuDetailById(Long goodsId);
+
+    /**
+     * 修改商品prod和sku库存数量
+     * @param changeStock
+     */
+    void changeStock(ChangeStock changeStock);
+
 }
