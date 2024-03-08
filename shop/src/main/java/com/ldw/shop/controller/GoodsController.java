@@ -81,4 +81,7 @@ public class GoodsController {
         Page<Goods> resultpage = new Page<>();
         return resultpage.setRecords(goods);
     }
+
+
+
 }

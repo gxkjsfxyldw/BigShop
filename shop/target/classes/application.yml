@@ -1,6 +1,9 @@
 server:
   #端口
   port: 8086
+  servlet:
+    encoding:
+      enabled: true
 
 spring:
   #数据源配置
@@ -66,7 +69,10 @@ spring:
       simple:
         #开启手动确认
         acknowledge-mode: manual
-# Mybatis-plus配置
+
+  http:
+    encoding:
+      enabled=true:# Mybatis-plus配置
 mybatis-plus:
   #配置Mapper映射文件
   mapper-locations: classpath*:/com/ldw/shop/dao/mapper/*Mapper.xml
@@ -92,3 +98,7 @@ jwt:
   expiration: 604800
   # JWT 负载中拿到开头
   tokenHead: Bearer
+
+cache:
+  init:
+    enable: true

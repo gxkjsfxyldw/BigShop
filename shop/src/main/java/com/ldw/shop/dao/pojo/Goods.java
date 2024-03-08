@@ -25,7 +25,6 @@ import java.util.List;
 @NoArgsConstructor
 @TableName(value = "goods")
 public class Goods  implements Serializable {
-
     /**
      * 产品ID
      */
