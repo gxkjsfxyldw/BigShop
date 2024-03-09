@@ -152,11 +152,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.redisson/redisson -->
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson</artifactId>
-            <version>3.27.0</version>
+            <version>3.6.5</version>
         </dependency>
 
         <!--fastdfs     自己下载手动引入的依赖-->
@@ -179,9 +180,4 @@
             <version>1.2.76</version>
         </dependency>
     </dependencies>
-
-
-
-
-
 </project>

@@ -51,8 +51,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private OrderItemService orderItemService;
     @Autowired
     private RabbitTemplate rabbitTemplate;
-//    @Autowired
-//    private Redisson redisson;
+    @Autowired
+    private Redisson redisson;
 
     @Override
     public OrderStatus selectUserOrderStatus(Integer userId) {
@@ -255,9 +255,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         String orderNumber = generateOrderNumber();
         String lockKey="order_"+orderNumber;
 //        //获取分布式锁
-//        RLock redissionlock = redisson.getLock(lockKey);
+        RLock redissionlock = redisson.getLock(lockKey);
 //        //加锁
-//        redissionlock.lock();
+        redissionlock.lock();
         try {
             //修改商品和sku库存数量
             ChangeStock changeStock = changeProdAndSkuStock(orderVo);
@@ -266,7 +266,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             //将商品修改的库存数量消息存放到消息队列
             sendMsMsg(orderNumber,changeStock);
         }finally {
-//            redissionlock.unlock();
+            redissionlock.unlock();
         }
         return orderNumber;
     }

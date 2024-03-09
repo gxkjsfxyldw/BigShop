@@ -23,13 +23,12 @@ public class ShopApplication {
         return new Snowflake(0L,0L);
     }
 
-//    @Bean
-//    public Redisson redisson(){
-//        //单机模式
-//        Config config=new Config();
-//        config.useSingleServer().setAddress("redis://localhost:6379").setDatabase(0);
-//        config.setLockWatchdogTimeout(10000);//设置分布式锁watch dog超时时间
-//        return (Redisson)Redisson.create(config);
-//    }
+    @Bean
+    public Redisson redisson(){
+        Config config=new Config();
+        config.useSingleServer().setAddress("redis://localhost:6379").setDatabase(0);
+//        config.setLockWatchdogTimeout(10000);
+        return (Redisson) Redisson.create(config);
+    }
 
 }
