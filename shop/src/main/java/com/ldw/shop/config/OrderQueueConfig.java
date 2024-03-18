@@ -23,11 +23,11 @@ public class OrderQueueConfig {
     public Queue orderMsQueue() {
 
         Map<String,Object> map = new HashMap<>();
-        //配置消息存活的时候
+        //配置消息存活的时间
         map.put("x-message-ttl",60*1000);
         //配置消息死后去哪个交换机
         map.put("x-dead-letter-exchange",QueueConstant.ORDER_DEAD_EX);
-        //配置消息死后去哪个路由key
+        //配置消息死后去哪个路由key 队列
         map.put("x-dead-letter-routing-key",QueueConstant.ORDER_DEAD_KEY);
         // 1、队列的名称
         // 2、是否持久化
@@ -37,7 +37,10 @@ public class OrderQueueConfig {
         return new Queue(QueueConstant.ORDER_MS_QUEUE,true,false,false,map);
     }
 
-    //队列
+    /**
+     * 创建死信队列
+     * @return
+     */
     @Bean
     public Queue orderDeadQueue() {
         return new Queue(QueueConstant.ORDER_DEAD_QUEUE);

@@ -281,6 +281,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         // 第二个是路由键(routing-key)的名字
         // 第三个则为消息的内容
         rabbitTemplate.convertAndSend(QueueConstant.ORDER_MS_QUEUE,jsonObject.toJSONString());
+
     }
 
 
